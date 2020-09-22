@@ -23,20 +23,20 @@ vec3 white_noise(vec2 uv) {
 }
 
 vec3 scan_line(vec3 col, vec2 uv) {
-  float scanLineColor = sin(iTime * 10 + uv.y * 500) / 2 + 0.5;
-  col *= 0.1 + clamp(scanLineColor + 0.5, 0, 1) * 0.5;
+  float scan_line_color = sin(iTime * 10 + uv.y * 500) / 2 + 0.5;
+  col *= 0.1 + clamp(scan_line_color + 0.5, 0, 1) * 0.5;
 
-  float _ScanLineSpeed = 50;
-  float _ScanLineTail = 1.8;
+  float scan_line_speed = 50;
+  float scan_line_tail = 1.8;
   float tail =
-      clamp((fract(uv.y + iTime * _ScanLineSpeed) - 1 + _ScanLineTail) /
-                min(_ScanLineTail, 1),
+      clamp((fract(uv.y + iTime * scan_line_speed) - 1 + scan_line_tail) /
+                min(scan_line_tail, 1),
             0, 1);
 
   return col *= tail;
 }
 
-vec2 screenDistort(vec2 uv, float distortion) {
+vec2 screen_distort(vec2 uv, float distortion) {
   uv -= vec2(.5, .5);
   uv *= vec2(pow(length(uv), distortion));
   uv += vec2(.5, .5);
@@ -112,7 +112,7 @@ vec3 vignette(vec3 col, vec2 uv) {
 }
 
 void main() {
-  vec2 uv = screenDistort(iuv, 0.03);
+  vec2 uv = screen_distort(iuv, 0.03);
   vec3 col = texture(myTextureSampler, uv).rgb;
 
   col = mix(col, overlay(col, bloom(col, uv)), 0.8);
