@@ -9,11 +9,6 @@ int main(int argc, char* argv[]) {
     error("Invalid argument number: %d\n", argc);
   }
 
-  if (strcmp(argv[1], "-test") == 0) {
-    run_test();
-    return 0;
-  }
-
   chip8 = initialize();
   gfx_setup(chip8);
 
