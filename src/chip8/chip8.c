@@ -2,24 +2,10 @@
 
 CHIP8* initialize() {
   CHIP8* chip8;
-  CPU* cpu;
 
-  cpu = malloc(sizeof(CPU));
-  cpu->pc = ROM_ADDRESS;
-  cpu->i = 0;
-  cpu->sp = 0;
-  cpu->v = calloc(sizeof(DATA_REGISTER), DATA_REGISTER_COUNT);
-  cpu->delay_timer = 0;
-  cpu->sound_timer = 0;
-
-  chip8 = malloc(sizeof(CHIP8));
-  chip8->memory = calloc(sizeof(uint8_t), MEMORY_SIZE);
-  chip8->stack = calloc(sizeof(STACK), STACK_DEPTH_COUNT);
-  chip8->display_buffer =
-      calloc(sizeof(uint8_t), (DISPLAY_HEIGHT * DISPLAY_WIDTH));
+  chip8 = calloc(sizeof(CHIP8), 1);
   chip8->display_flag = true;
-  chip8->key_inputs = calloc(KEY_COUNT, sizeof(uint8_t));
-  chip8->cpu = cpu;
+  chip8->cpu.pc = ROM_ADDRESS;
 
   for (int i = 0; i < 80; i++)
     chip8->memory[FONT_ADDRESS + i] = chip8_fontset[i];
@@ -48,7 +34,7 @@ void load_rom(uint8_t* memory, char* file_path) {
 
   if (MEMORY_SIZE > file_size) {
     for (int i = 0; i < file_size; ++i) {
-      memory[i + 512] = (uint8_t)rom_buffer[i];
+      memory[ROM_ADDRESS + i] = (uint8_t)rom_buffer[i];
     }
   }
 
@@ -56,16 +42,16 @@ void load_rom(uint8_t* memory, char* file_path) {
 };
 
 void timer_tick(CHIP8* chip8) {
-  if (chip8->cpu->delay_timer > 0) chip8->cpu->delay_timer--;
-  if (chip8->cpu->sound_timer > 0) {
-    chip8->cpu->sound_timer--;
-    if (chip8->cpu->sound_timer == 0) debug_print("BEEP!\n");
+  if (chip8->cpu.delay_timer > 0) chip8->cpu.delay_timer--;
+  if (chip8->cpu.sound_timer > 0) {
+    chip8->cpu.sound_timer--;
+    if (chip8->cpu.sound_timer == 0) debug_print("BEEP!\n");
   }
 }
 
 void cpu_tick(CHIP8* chip8) {
   uint16_t opcode =
-      chip8->memory[chip8->cpu->pc] << 8 | chip8->memory[chip8->cpu->pc + 1];
+      chip8->memory[chip8->cpu.pc] << 8 | chip8->memory[chip8->cpu.pc + 1];
 
   instruct_op(chip8, opcode);
 }

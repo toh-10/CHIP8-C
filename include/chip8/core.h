@@ -7,7 +7,7 @@
 #define ROM_ADDRESS 0x200
 #define MEMORY_SIZE 4096 - 0x200
 #define MAX_ROM_SIZE 4096
-#define DATA_REGISTER_COUNT 16
+#define DATA_REGISTER_SIZE 16
 #define STACK_DEPTH_COUNT 16
 #define DELAY_TIMER_COUNT 60
 #define SOUND_TIMER_COUNT 60
@@ -28,7 +28,7 @@ typedef uint8_t DATA_REGISTER;
 typedef uint16_t STACK;
 
 typedef struct cpu {
-  DATA_REGISTER *v;
+  DATA_REGISTER v[DATA_REGISTER_SIZE];
   uint16_t i;
   uint16_t pc;
   uint16_t sp;
@@ -37,11 +37,11 @@ typedef struct cpu {
 } CPU;
 
 typedef struct chip8 {
-  CPU *cpu;
-  STACK *stack;
-  uint8_t *memory;
-  uint8_t *key_inputs;
-  uint8_t *display_buffer;
+  CPU cpu;
+  STACK stack[STACK_DEPTH_COUNT];
+  uint8_t key_inputs[KEY_COUNT];
+  uint8_t memory[MEMORY_SIZE];
+  uint8_t display_buffer[DISPLAY_SIZE];
   uint8_t display_flag;
 } CHIP8;
 

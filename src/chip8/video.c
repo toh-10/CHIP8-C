@@ -7,7 +7,7 @@ void display_draw(CHIP8* chip8, uint8_t x, uint8_t y, uint8_t n) {
   uint16_t pixel_index;
 
   for (sprite_row = 0; sprite_row < n; sprite_row++) {
-    byte_to_write = chip8->memory[chip8->cpu->i + sprite_row];
+    byte_to_write = chip8->memory[chip8->cpu.i + sprite_row];
 
     for (sprite_col = 0; sprite_col < 8; sprite_col++) {
       if (byte_to_write & (0x80 >> sprite_col)) {
@@ -15,7 +15,7 @@ void display_draw(CHIP8* chip8, uint8_t x, uint8_t y, uint8_t n) {
         y_coordinate = (y + sprite_row);
         pixel_index = y_coordinate * DISPLAY_WIDTH + x_coordinate;
 
-        if (chip8->display_buffer[pixel_index] == 0x01) chip8->cpu->v[0xF] = 1;
+        if (chip8->display_buffer[pixel_index] == 0x01) chip8->cpu.v[0xF] = 1;
         chip8->display_buffer[pixel_index] ^= 0x01;
       }
     }
