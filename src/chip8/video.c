@@ -6,6 +6,8 @@ void display_draw(CHIP8* chip8, uint8_t x, uint8_t y, uint8_t n) {
   uint8_t sprite_row, sprite_col, x_coordinate, y_coordinate, byte_to_write;
   uint16_t pixel_index;
 
+  chip8->cpu.v[0xF] = 0;
+
   for (sprite_row = 0; sprite_row < n; sprite_row++) {
     byte_to_write = chip8->memory[chip8->cpu.i + sprite_row];
 
