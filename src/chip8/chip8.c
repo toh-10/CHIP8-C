@@ -29,8 +29,8 @@ void load_rom(uint8_t* memory, char* file_path) {
   char* rom_buffer = (char*)malloc(sizeof(char) * file_size);
   if (rom_buffer == NULL) error("Out of memory.");
 
-  size_t result = fread(rom_buffer, sizeof(char), (size_t)file_size, fd);
-  if (result != file_size) error("Unable to read ROM.");
+  fr = fread(rom_buffer, sizeof(char), (size_t)file_size, fd);
+  if (fr != file_size) error("Unable to read ROM.");
 
   if (MEMORY_SIZE > file_size) {
     for (int i = 0; i < file_size; ++i) {
@@ -64,8 +64,6 @@ void tick(CHIP8* chip8) {
 
 void run(CHIP8* chip8, bool (*should_close_callback)(),
          void (*video_callback)()) {
-  struct timeval clock_now;
-
   video_register_callback(video_callback);
 
   while (!should_close_callback()) {

@@ -13,7 +13,12 @@ static GLuint fragment_shader_id;
 static GLuint shader_program_id;
 static CHIP8* gfx_chip8;
 
-static struct timeval time_prev;
+static GLuint index_buffer[] = {0, 1, 2, 2, 3, 0};
+
+static GLfloat vertex_buffer[] = {-1.0f, 1.0f,  0.0f, 0.0f, 0.0f,   // vertex 1
+                                  1.0f,  1.0f,  0.0f, 1.0f, 0.0f,   // vertex 2
+                                  1.0f,  -1.0f, 0.0f, 1.0f, 1.0f,   // vertex 3
+                                  -1.0f, -1.0f, 0.0f, 0.0f, 1.0f};  // vertex 4
 
 static void paint_pixel(GLuint row, GLuint col, COLOR* color) {
   screen[row][col][0] = color->r;
@@ -180,7 +185,6 @@ static GLchar* load_shader_file(const GLchar* file_path) {
   FILE* fd;
   GLchar* rom_buffer;
   size_t fr;
-  size_t result;
   uint16_t file_size;
 
   fd = fopen(file_path, "r");
@@ -193,8 +197,8 @@ static GLchar* load_shader_file(const GLchar* file_path) {
   rom_buffer = (GLchar*)malloc(sizeof(GLchar) * file_size + 1);
   if (rom_buffer == NULL) return false;
 
-  result = fread(rom_buffer, sizeof(GLchar), (size_t)file_size, fd);
-  if (result != file_size) return false;
+  fr = fread(rom_buffer, sizeof(GLchar), (size_t)file_size, fd);
+  if (fr != file_size) return false;
   fclose(fd);
 
   rom_buffer[file_size] = '\0';
@@ -203,22 +207,22 @@ static GLchar* load_shader_file(const GLchar* file_path) {
 }
 
 static void setup_vertex_shader() {
-  GLchar* vertex_shader_blob;
+  const GLchar* vertex_shader_source;
 
-  vertex_shader_blob = load_shader_file("./shaders/chip8.vert");
+  vertex_shader_source = load_shader_file("./shaders/chip8.vert");
   vertex_shader_id = glCreateShader(GL_VERTEX_SHADER);
 
-  glShaderSource(vertex_shader_id, 1, &vertex_shader_blob, 0);
+  glShaderSource(vertex_shader_id, 1, &vertex_shader_source, 0);
   glCompileShader(vertex_shader_id);
 }
 
 static void setup_fragment_shader() {
-  GLchar* fragment_shader_blob;
+  const GLchar* fragment_shader_source;
 
-  fragment_shader_blob = load_shader_file("./shaders/crt.frag");
+  fragment_shader_source = load_shader_file("./shaders/crt.frag");
   fragment_shader_id = glCreateShader(GL_FRAGMENT_SHADER);
 
-  glShaderSource(fragment_shader_id, 1, &fragment_shader_blob, 0);
+  glShaderSource(fragment_shader_id, 1, &fragment_shader_source, 0);
   glCompileShader(fragment_shader_id);
 }
 
@@ -259,7 +263,7 @@ static void setup_shaders() {
 
 void gfx_key_input(GLFWwindow* window, int key, int scancode, int action,
                    int mods) {
-  char* key_name = glfwGetKeyName(key, scancode);
+  const char* key_name = glfwGetKeyName(key, scancode);
   if (key_name == NULL) return;
 
   if (action == GLFW_PRESS) {
@@ -278,7 +282,7 @@ void window_close_callback(GLFWwindow* window) {
   debug_print("Window closed.\n");
 }
 
-int gfx_closed() { return glfwWindowShouldClose(window); }
+bool gfx_closed() { return (bool)glfwWindowShouldClose(window); }
 
 void gfx_setup(CHIP8* chip8) {
   gfx_chip8 = chip8;
@@ -324,9 +328,9 @@ void gfx_draw(uint8_t* display_buffer) {
 void gfx_terminate() {
   glfwDestroyWindow(window);
 
-  glDeleteBuffers(1, vertex_buffer);
-  glDeleteBuffers(1, index_buffer);
-  glDeleteVertexArrays(1, vertex_array_id);
+  glDeleteBuffers(1, &vertex_buffer_id);
+  glDeleteBuffers(1, &index_buffer_id);
+  glDeleteVertexArrays(1, &vertex_array_id);
   glDeleteTextures(1, &texture_id);
 
   glDeleteProgram(shader_program_id);

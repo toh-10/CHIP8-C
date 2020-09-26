@@ -21,9 +21,6 @@
 #define CLOCK_HZ 60
 #define CLOCK_RATE_MS (int)((1.0 / CLOCK_HZ) * 1000)
 
-// TODO: move to timer
-struct timeval clock_prev;
-
 typedef uint8_t DATA_REGISTER;
 typedef uint16_t STACK;
 
